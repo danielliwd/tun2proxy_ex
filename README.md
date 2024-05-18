@@ -43,3 +43,10 @@ tun2proxy in docker
 
 1. `scripts/bashrc`
    容器命令行交互的初始化配置
+
+## 常见问题
+
+1. 为什么出口地址不是代理地址
+
+   先看看`/app/t.log`日志输出
+   再看看代理服务是否使用了路由(如clash, 其规则决定了出口，最后一行一般是: `- MATCH,Final`, 会使用Final这个proxy-group, ip容易miss很多规则，最后匹配Final)
