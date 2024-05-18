@@ -1,0 +1,31 @@
+#!/bin/bash
+
+
+export PROXY_IP=${PROXY_IP:-192.168.2.10} # for bypass
+export PROXY_PORT=${PROXY_PORT:-6245} # for bypass
+export default_route=$(ip route | grep '^default' | cut -d ' ' -f 2-)
+
+set_up() {
+	ip tuntap add name tun0 mode tun
+	ip link set tun0 up
+
+	ip route add "$PROXY_IP" ${default_route}
+	ip route add "202.96.128.86" ${default_route}
+	ip route add 128.0.0.0/1 dev tun0
+	ip route add 0.0.0.0/1 dev tun0
+	# ip route add 104.16.185.241 dev tun0
+	# ip route add 104.16.184.241 dev tun0
+	ip route add ::/1 dev tun0
+	ip route add 8000::/1 dev tun0
+}
+
+run_tun2proxy() {
+	nohup ./tun2proxy --tun tun0 --proxy socks5://${PROXY_IP}:${PROXY_PORT} -v trace >> /app/t.log 2>&1 &
+}
+
+set_up
+sleep 2
+run_tun2proxy
+sleep 1
+curl http://icanhazip.com
+

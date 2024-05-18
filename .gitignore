@@ -1,0 +1,4 @@
+release
+x86_64-unknown-linux-gnu
+.rust*
+app
